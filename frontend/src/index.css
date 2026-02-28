@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased text-gray-800;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+@layer components {
+  .urgency-reassurance {
+    @apply bg-emerald-50 border-emerald-300 text-emerald-800;
+  }
+  .urgency-monitor {
+    @apply bg-amber-50 border-amber-300 text-amber-800;
+  }
+  .urgency-see_doctor {
+    @apply bg-orange-50 border-orange-300 text-orange-800;
+  }
+  .urgency-urgent {
+    @apply bg-red-50 border-red-300 text-red-800;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* Markdown in chat */
+.chat-markdown h1, .chat-markdown h2, .chat-markdown h3 {
+  @apply font-semibold mt-3 mb-1;
+}
+.chat-markdown h1 { @apply text-lg; }
+.chat-markdown h2 { @apply text-base; }
+.chat-markdown h3 { @apply text-sm; }
+.chat-markdown p { @apply mb-2 leading-relaxed; }
+.chat-markdown ul, .chat-markdown ol { @apply ml-4 mb-2; }
+.chat-markdown ul { @apply list-disc; }
+.chat-markdown ol { @apply list-decimal; }
+.chat-markdown li { @apply mb-1; }
+.chat-markdown strong { @apply font-semibold; }
+.chat-markdown em { @apply italic; }
+.chat-markdown code { @apply bg-gray-100 px-1 py-0.5 rounded text-sm font-mono; }
+.chat-markdown blockquote { @apply border-l-4 border-gray-300 pl-3 italic text-gray-600 my-2; }
+
+/* Loading animation */
+@keyframes pulse-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+  30% { opacity: 1; transform: scale(1); }
+}
+.loading-dot { animation: pulse-dot 1.4s infinite ease-in-out; }
+.loading-dot:nth-child(1) { animation-delay: 0s; }
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
