@@ -6,7 +6,7 @@ import {
   Stethoscope, Brain, ArrowDown
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
-import { sendMessage, sendMessageStream, sendImageMessage, clearConversations, createProfile } from '../api/client'
+import { sendMessage, sendMessageStream, sendImageMessage, clearConversations, createProfile, getConversations } from '../api/client'
 
 const QUICK_DEMOS = [
   {
@@ -161,6 +161,29 @@ export default function ChatPanel({ patientId, profile, onNewTimelineEvents, onN
       }
     }
   }
+
+  // Load stored conversation history on mount / patient change
+  useEffect(() => {
+    if (!patientId) return
+    async function loadHistory() {
+      try {
+        const data = await getConversations(patientId)
+        const stored = data.messages || []
+        if (stored.length > 0) {
+          const loaded = stored.map(m => ({
+            role: m.role,
+            content: m.content,
+            urgency_level: m.urgency_level || null,
+            hasImage: m.has_image || false,
+          }))
+          setMessages([WELCOME_MESSAGE, ...loaded])
+        }
+      } catch (err) {
+        console.error('Failed to load chat history:', err)
+      }
+    }
+    loadHistory()
+  }, [patientId])
 
   useEffect(() => {
     scrollToBottom()
