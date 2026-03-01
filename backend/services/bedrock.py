@@ -263,7 +263,31 @@ class BedrockClient(AIClient):
         self.model_id = config.BEDROCK_MODEL_ID
         logger.info(f"Initialized Bedrock client with model: {self.model_id}")
 
+    @staticmethod
+    def _sanitize_messages(messages):
+        """Strip 'type' field from content blocks — Bedrock doesn't accept it."""
+        sanitized = []
+        for msg in messages:
+            new_msg = {"role": msg["role"]}
+            content = msg.get("content", [])
+            if isinstance(content, str):
+                new_msg["content"] = [{"text": content}]
+            elif isinstance(content, list):
+                new_content = []
+                for block in content:
+                    if isinstance(block, dict):
+                        clean = {k: v for k, v in block.items() if k != "type"}
+                        new_content.append(clean)
+                    else:
+                        new_content.append(block)
+                new_msg["content"] = new_content
+            else:
+                new_msg["content"] = content
+            sanitized.append(new_msg)
+        return sanitized
+
     def converse(self, messages, system_prompt, tools=None, max_tokens=4096, temperature=0.3):
+        messages = self._sanitize_messages(messages)
         kwargs = {
             "modelId": self.model_id,
             "messages": messages,
@@ -281,6 +305,7 @@ class BedrockClient(AIClient):
             raise
 
     def converse_stream(self, messages, system_prompt, tools=None, max_tokens=4096, temperature=0.3):
+        messages = self._sanitize_messages(messages)
         kwargs = {
             "modelId": self.model_id,
             "messages": messages,
