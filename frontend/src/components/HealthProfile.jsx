@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Save, Plus, X, Pill, AlertCircle, Heart, Edit3, Check } from 'lucide-react'
+import { Plus, X, Pill, AlertCircle, Heart, Edit3, Check, User, Shield, Sparkles, Stethoscope } from 'lucide-react'
 import { updateProfile } from '../api/client'
 
 export default function HealthProfile({ patientId, profile, onUpdate }) {
@@ -89,41 +89,67 @@ export default function HealthProfile({ patientId, profile, onUpdate }) {
   }
 
   const isEmpty = !form.name && !form.age && form.medications.length === 0 && form.conditions.length === 0
+  const completionItems = [form.name, form.age, form.medications.length > 0, form.conditions.length > 0 || form.allergies.length > 0]
+  const completionPct = Math.round((completionItems.filter(Boolean).length / completionItems.length) * 100)
 
   return (
     <div className="p-4 space-y-4">
-      {/* Header */}
+      {/* Header with Edit Button */}
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-gray-800 text-sm">Health Profile</h3>
+        <h3 className="font-bold text-gray-800 text-sm flex items-center gap-1.5">
+          <User className="w-4 h-4 text-indigo-500" />
+          Health Profile
+        </h3>
         <button
           onClick={() => editing ? handleSave() : setEditing(true)}
           disabled={saving}
-          className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
+          className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-200 active:scale-95 ${
             editing
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              ? 'btn-primary shadow-sm'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
           {editing ? (
-            <>
-              {saving ? 'Saving...' : <><Check className="w-3 h-3" /> Save</>}
-            </>
+            saving ? 'Saving...' : <><Check className="w-3 h-3" /> Save</>
           ) : (
-            <>
-              <Edit3 className="w-3 h-3" /> Edit
-            </>
+            <><Edit3 className="w-3 h-3" /> Edit</>
           )}
         </button>
       </div>
 
+      {/* Profile Completion Card */}
+      {!editing && (
+        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 rounded-xl p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-indigo-700">Profile Completeness</span>
+            <span className="text-xs font-bold text-indigo-600">{completionPct}%</span>
+          </div>
+          <div className="w-full h-2 bg-white rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-700 ease-out"
+              style={{ width: `${completionPct}%` }}
+            />
+          </div>
+          {completionPct < 100 && (
+            <p className="text-[10px] text-indigo-400 mt-1.5 flex items-center gap-1">
+              <Sparkles className="w-3 h-3" />
+              Complete your profile for better personalized guidance
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Empty State */}
       {isEmpty && !editing && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-          <Heart className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-          <p className="text-sm text-blue-700 font-medium">Set up your health profile</p>
-          <p className="text-xs text-blue-600 mt-1">Add your medications, conditions, and allergies for personalized guidance.</p>
+        <div className="bg-gradient-to-br from-indigo-50 via-blue-50 to-emerald-50 border border-indigo-100 rounded-xl p-5 text-center">
+          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center shadow-lg shadow-indigo-200/50">
+            <Stethoscope className="w-7 h-7 text-white" />
+          </div>
+          <p className="text-sm text-gray-700 font-bold">Set up your health profile</p>
+          <p className="text-xs text-gray-500 mt-1 leading-relaxed">Add your medications, conditions, and allergies so MedAlly can provide personalized guidance.</p>
           <button
             onClick={() => setEditing(true)}
-            className="mt-2 text-xs bg-blue-600 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700"
+            className="mt-3 text-xs btn-primary px-5 py-2 rounded-lg font-semibold"
           >
             Get Started
           </button>
@@ -134,31 +160,31 @@ export default function HealthProfile({ patientId, profile, onUpdate }) {
       {editing ? (
         <div className="space-y-3">
           <div>
-            <label className="text-xs font-medium text-gray-500 block mb-1">Name</label>
+            <label className="text-xs font-semibold text-gray-500 block mb-1">Name</label>
             <input
               value={form.name}
               onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all hover:border-gray-300"
               placeholder="Your name"
             />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-xs font-medium text-gray-500 block mb-1">Age</label>
+              <label className="text-xs font-semibold text-gray-500 block mb-1">Age</label>
               <input
                 type="number"
                 value={form.age}
                 onChange={(e) => setForm(prev => ({ ...prev, age: e.target.value }))}
-                className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all hover:border-gray-300"
                 placeholder="Age"
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-500 block mb-1">Sex</label>
+              <label className="text-xs font-semibold text-gray-500 block mb-1">Sex</label>
               <select
                 value={form.sex}
                 onChange={(e) => setForm(prev => ({ ...prev, sex: e.target.value }))}
-                className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all hover:border-gray-300"
               >
                 <option value="">Select</option>
                 <option value="Male">Male</option>
@@ -170,55 +196,69 @@ export default function HealthProfile({ patientId, profile, onUpdate }) {
         </div>
       ) : (
         form.name && (
-          <div className="text-sm text-gray-700">
-            <span className="font-medium">{form.name}</span>
-            {form.age && <span className="text-gray-500"> · {form.age}y</span>}
-            {form.sex && <span className="text-gray-500"> · {form.sex}</span>}
+          <div className="flex items-center gap-3 bg-white border border-gray-100 rounded-xl p-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center shadow-sm">
+              <span className="text-white font-bold text-sm">{form.name.charAt(0).toUpperCase()}</span>
+            </div>
+            <div>
+              <span className="font-bold text-sm text-gray-800">{form.name}</span>
+              <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                {form.age && <span>{form.age} years</span>}
+                {form.age && form.sex && <span>·</span>}
+                {form.sex && <span>{form.sex}</span>}
+              </div>
+            </div>
           </div>
         )
       )}
 
       {/* Medications */}
       <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1.5">
-          <Pill className="w-3.5 h-3.5" /> Medications ({form.medications.length})
-        </h4>
-        {form.medications.map((med, idx) => (
-          <div key={idx} className="flex items-start justify-between bg-emerald-50 border border-emerald-100 rounded-lg p-2 mb-1.5">
-            <div>
-              <span className="text-sm font-medium text-emerald-800">{med.name}</span>
-              {med.dosage && <span className="text-xs text-emerald-600 ml-1">({med.dosage})</span>}
-              <div className="text-xs text-emerald-600">
-                {med.frequency && <span>{med.frequency}</span>}
-                {med.start_date && <span> · Started: {med.start_date}</span>}
-              </div>
-            </div>
-            {editing && (
-              <button onClick={() => removeMedication(idx)} className="p-1 hover:bg-emerald-100 rounded">
-                <X className="w-3.5 h-3.5 text-emerald-500" />
-              </button>
-            )}
+        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <div className="w-5 h-5 rounded-md bg-emerald-100 flex items-center justify-center">
+            <Pill className="w-3 h-3 text-emerald-600" />
           </div>
-        ))}
+          Medications
+          <span className="text-gray-300 font-normal">({form.medications.length})</span>
+        </h4>
+        <div className="space-y-1.5">
+          {form.medications.map((med, idx) => (
+            <div key={idx} className="flex items-start justify-between bg-emerald-50 border border-emerald-100 rounded-xl p-2.5 group hover:shadow-sm transition-shadow">
+              <div>
+                <span className="text-sm font-semibold text-emerald-800">{med.name}</span>
+                {med.dosage && <span className="text-xs text-emerald-500 ml-1.5">({med.dosage})</span>}
+                <div className="text-[11px] text-emerald-500 mt-0.5">
+                  {med.frequency && <span>{med.frequency}</span>}
+                  {med.start_date && <span> · Since {med.start_date}</span>}
+                </div>
+              </div>
+              {editing && (
+                <button onClick={() => removeMedication(idx)} className="p-1 hover:bg-emerald-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                  <X className="w-3.5 h-3.5 text-emerald-400" />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
         {editing && (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-2 space-y-1.5">
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-2.5 mt-2 space-y-1.5">
             <input
               value={newMed.name}
               onChange={(e) => setNewMed(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full text-xs border border-gray-300 rounded px-2 py-1.5"
+              className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
               placeholder="Medication name"
             />
             <div className="grid grid-cols-2 gap-1.5">
               <input
                 value={newMed.dosage}
                 onChange={(e) => setNewMed(prev => ({ ...prev, dosage: e.target.value }))}
-                className="text-xs border border-gray-300 rounded px-2 py-1.5"
+                className="text-xs border border-gray-200 rounded-lg px-2.5 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
                 placeholder="Dosage (e.g., 10mg)"
               />
               <input
                 value={newMed.frequency}
                 onChange={(e) => setNewMed(prev => ({ ...prev, frequency: e.target.value }))}
-                className="text-xs border border-gray-300 rounded px-2 py-1.5"
+                className="text-xs border border-gray-200 rounded-lg px-2.5 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
                 placeholder="Frequency (e.g., daily)"
               />
             </div>
@@ -227,12 +267,12 @@ export default function HealthProfile({ patientId, profile, onUpdate }) {
                 type="date"
                 value={newMed.start_date}
                 onChange={(e) => setNewMed(prev => ({ ...prev, start_date: e.target.value }))}
-                className="flex-1 text-xs border border-gray-300 rounded px-2 py-1.5"
+                className="flex-1 text-xs border border-gray-200 rounded-lg px-2.5 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
               />
               <button
                 onClick={addMedication}
                 disabled={!newMed.name.trim()}
-                className="px-3 py-1.5 text-xs bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-40 flex items-center gap-1"
+                className="px-3 py-2 text-xs bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-40 flex items-center gap-1 font-semibold transition-colors active:scale-95"
               >
                 <Plus className="w-3 h-3" /> Add
               </button>
@@ -243,20 +283,27 @@ export default function HealthProfile({ patientId, profile, onUpdate }) {
 
       {/* Conditions */}
       <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1.5">
-          <AlertCircle className="w-3.5 h-3.5" /> Conditions ({form.conditions.length})
+        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <div className="w-5 h-5 rounded-md bg-orange-100 flex items-center justify-center">
+            <AlertCircle className="w-3 h-3 text-orange-600" />
+          </div>
+          Conditions
+          <span className="text-gray-300 font-normal">({form.conditions.length})</span>
         </h4>
         <div className="flex flex-wrap gap-1.5 mb-1.5">
           {form.conditions.map((c, idx) => (
-            <span key={idx} className="inline-flex items-center gap-1 bg-orange-50 border border-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">
+            <span key={idx} className="inline-flex items-center gap-1 bg-orange-50 border border-orange-100 text-orange-800 text-xs font-medium px-2.5 py-1 rounded-full hover:shadow-sm transition-shadow">
               {c}
               {editing && (
-                <button onClick={() => setForm(prev => ({ ...prev, conditions: prev.conditions.filter((_, i) => i !== idx) }))}>
+                <button onClick={() => setForm(prev => ({ ...prev, conditions: prev.conditions.filter((_, i) => i !== idx) }))} className="hover:bg-orange-100 rounded-full p-0.5">
                   <X className="w-3 h-3 text-orange-400" />
                 </button>
               )}
             </span>
           ))}
+          {form.conditions.length === 0 && !editing && (
+            <span className="text-xs text-gray-300 italic">No conditions added</span>
+          )}
         </div>
         {editing && (
           <div className="flex gap-1.5">
@@ -264,13 +311,13 @@ export default function HealthProfile({ patientId, profile, onUpdate }) {
               value={newCondition}
               onChange={(e) => setNewCondition(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addCondition()}
-              className="flex-1 text-xs border border-gray-300 rounded px-2 py-1.5"
+              className="flex-1 text-xs border border-gray-200 rounded-lg px-2.5 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent"
               placeholder="e.g., Type 2 Diabetes"
             />
             <button
               onClick={addCondition}
               disabled={!newCondition.trim()}
-              className="px-2 py-1.5 text-xs bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-40"
+              className="px-2.5 py-2 text-xs bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-40 font-semibold transition-colors active:scale-95"
             >
               <Plus className="w-3 h-3" />
             </button>
@@ -280,20 +327,27 @@ export default function HealthProfile({ patientId, profile, onUpdate }) {
 
       {/* Allergies */}
       <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-          ⚠️ Allergies ({form.allergies.length})
+        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <div className="w-5 h-5 rounded-md bg-red-100 flex items-center justify-center">
+            <Shield className="w-3 h-3 text-red-600" />
+          </div>
+          Allergies
+          <span className="text-gray-300 font-normal">({form.allergies.length})</span>
         </h4>
         <div className="flex flex-wrap gap-1.5 mb-1.5">
           {form.allergies.map((a, idx) => (
-            <span key={idx} className="inline-flex items-center gap-1 bg-red-50 border border-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+            <span key={idx} className="inline-flex items-center gap-1 bg-red-50 border border-red-100 text-red-800 text-xs font-medium px-2.5 py-1 rounded-full hover:shadow-sm transition-shadow">
               {a}
               {editing && (
-                <button onClick={() => setForm(prev => ({ ...prev, allergies: prev.allergies.filter((_, i) => i !== idx) }))}>
+                <button onClick={() => setForm(prev => ({ ...prev, allergies: prev.allergies.filter((_, i) => i !== idx) }))} className="hover:bg-red-100 rounded-full p-0.5">
                   <X className="w-3 h-3 text-red-400" />
                 </button>
               )}
             </span>
           ))}
+          {form.allergies.length === 0 && !editing && (
+            <span className="text-xs text-gray-300 italic">No allergies added</span>
+          )}
         </div>
         {editing && (
           <div className="flex gap-1.5">
@@ -301,13 +355,13 @@ export default function HealthProfile({ patientId, profile, onUpdate }) {
               value={newAllergy}
               onChange={(e) => setNewAllergy(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addAllergy()}
-              className="flex-1 text-xs border border-gray-300 rounded px-2 py-1.5"
+              className="flex-1 text-xs border border-gray-200 rounded-lg px-2.5 py-2 focus:ring-2 focus:ring-red-400 focus:border-transparent"
               placeholder="e.g., Penicillin"
             />
             <button
               onClick={addAllergy}
               disabled={!newAllergy.trim()}
-              className="px-2 py-1.5 text-xs bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-40"
+              className="px-2.5 py-2 text-xs bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-40 font-semibold transition-colors active:scale-95"
             >
               <Plus className="w-3 h-3" />
             </button>
@@ -318,19 +372,21 @@ export default function HealthProfile({ patientId, profile, onUpdate }) {
       {/* Lifestyle Notes */}
       {editing && (
         <div>
-          <label className="text-xs font-medium text-gray-500 block mb-1">Lifestyle Notes</label>
+          <label className="text-xs font-semibold text-gray-500 block mb-1">Lifestyle Notes</label>
           <textarea
             value={form.lifestyle_notes}
             onChange={(e) => setForm(prev => ({ ...prev, lifestyle_notes: e.target.value }))}
-            className="w-full text-xs border border-gray-300 rounded-lg px-3 py-2 h-16 resize-none"
+            className="w-full text-xs border border-gray-200 rounded-xl px-3 py-2.5 h-16 resize-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all hover:border-gray-300"
             placeholder="Diet, exercise, sleep patterns, stress levels..."
           />
         </div>
       )}
       {!editing && form.lifestyle_notes && (
-        <div>
-          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Lifestyle</h4>
-          <p className="text-xs text-gray-600">{form.lifestyle_notes}</p>
+        <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
+          <h4 className="text-xs font-bold text-blue-700 mb-1 flex items-center gap-1">
+            <Heart className="w-3 h-3" /> Lifestyle
+          </h4>
+          <p className="text-xs text-blue-600 leading-relaxed">{form.lifestyle_notes}</p>
         </div>
       )}
     </div>

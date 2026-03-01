@@ -2,9 +2,16 @@
 import json
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from abc import ABC, abstractmethod
 from typing import Optional
+
+# IST timezone (UTC+5:30)
+IST = timezone(timedelta(hours=5, minutes=30))
+
+def now_ist() -> str:
+    """Return current IST timestamp as ISO format string."""
+    return datetime.now(IST).strftime("%Y-%m-%dT%H:%M:%S.%f")
 
 from typing import Union
 from database.models import HealthProfile, Medication, TimelineEvent, ChatMessage
@@ -60,13 +67,13 @@ class LocalStorage(StorageBackend):
 
     def _read_json(self, path: str) -> Union[dict, list, None]:
         if os.path.exists(path):
-            with open(path, "r") as f:
+            with open(path, "r", encoding="utf-8") as f:
                 return json.load(f)
         return None
 
     def _write_json(self, path: str, data):
-        with open(path, "w") as f:
-            json.dump(data, f, indent=2, default=str)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, default=str, ensure_ascii=False)
 
     async def get_profile(self, patient_id: str) -> Optional[dict]:
         path = self._get_path("profile", patient_id)
@@ -74,7 +81,7 @@ class LocalStorage(StorageBackend):
 
     async def save_profile(self, patient_id: str, profile: dict) -> dict:
         path = self._get_path("profile", patient_id)
-        now = datetime.utcnow().isoformat()
+        now = now_ist()
         existing = self._read_json(path)
         if existing:
             profile["created_at"] = existing.get("created_at", now)
@@ -96,7 +103,7 @@ class LocalStorage(StorageBackend):
         events = self._read_json(path) or []
         event["event_id"] = event.get("event_id") or str(uuid.uuid4())
         event["patient_id"] = patient_id
-        event["timestamp"] = event.get("timestamp") or datetime.utcnow().isoformat()
+        event["timestamp"] = event.get("timestamp") or now_ist()
         events.append(event)
         self._write_json(path, events)
         return event
@@ -120,7 +127,7 @@ class LocalStorage(StorageBackend):
         messages = self._read_json(path) or []
         message["message_id"] = message.get("message_id") or str(uuid.uuid4())
         message["patient_id"] = patient_id
-        message["timestamp"] = message.get("timestamp") or datetime.utcnow().isoformat()
+        message["timestamp"] = message.get("timestamp") or now_ist()
         messages.append(message)
         self._write_json(path, messages)
         return message
