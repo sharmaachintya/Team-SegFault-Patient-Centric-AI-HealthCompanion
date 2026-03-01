@@ -12,7 +12,7 @@ class Config:
 
     # AWS Bedrock Settings
     AWS_REGION = os.getenv("AWS_REGION", "ap-south-1")
-    BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "apac.anthropic.claude-3-5-sonnet-20241022-v2:0")
+    BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "apac.anthropic.claude-sonnet-4-20250514-v1:0")
 
     # DynamoDB Tables
     DYNAMODB_TABLE_PROFILES = os.getenv("DYNAMODB_TABLE_PROFILES", "HealthCompanion_Profiles")
