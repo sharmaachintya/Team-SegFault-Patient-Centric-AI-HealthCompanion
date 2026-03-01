@@ -156,7 +156,7 @@ class DynamoDBStorage(StorageBackend):
             return None
 
     async def save_profile(self, patient_id: str, profile: dict) -> dict:
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(IST).isoformat()
         existing = await self.get_profile(patient_id)
         if existing:
             profile["created_at"] = existing.get("created_at", now)
@@ -193,7 +193,7 @@ class DynamoDBStorage(StorageBackend):
     async def add_timeline_event(self, patient_id: str, event: dict) -> dict:
         event["event_id"] = event.get("event_id") or str(uuid.uuid4())
         event["patient_id"] = patient_id
-        event["timestamp"] = event.get("timestamp") or datetime.utcnow().isoformat()
+        event["timestamp"] = event.get("timestamp") or datetime.now(IST).isoformat()
         self.timeline_table.put_item(Item=event)
         return event
 
@@ -222,7 +222,7 @@ class DynamoDBStorage(StorageBackend):
     async def save_message(self, patient_id: str, message: dict) -> dict:
         message["message_id"] = message.get("message_id") or str(uuid.uuid4())
         message["patient_id"] = patient_id
-        message["timestamp"] = message.get("timestamp") or datetime.utcnow().isoformat()
+        message["timestamp"] = message.get("timestamp") or datetime.now(IST).isoformat()
         self.conversations_table.put_item(Item=message)
         return message
 
