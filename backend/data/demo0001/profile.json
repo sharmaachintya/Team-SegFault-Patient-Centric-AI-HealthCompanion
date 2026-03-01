@@ -1,0 +1,47 @@
+{
+  "patient_id": "demo0001",
+  "name": "Rahul Sharma",
+  "age": 42,
+  "sex": "Male",
+  "medications": [
+    {
+      "name": "Metformin",
+      "dosage": "500mg",
+      "frequency": "twice daily",
+      "start_date": "2025-11-15",
+      "notes": ""
+    },
+    {
+      "name": "Lisinopril",
+      "dosage": "10mg",
+      "frequency": "once daily",
+      "start_date": "2026-02-18",
+      "notes": ""
+    },
+    {
+      "name": "Atorvastatin",
+      "dosage": "20mg",
+      "frequency": "once daily at bedtime",
+      "start_date": "2025-12-01",
+      "notes": ""
+    },
+    {
+      "name": "Pantop",
+      "dosage": "",
+      "frequency": "",
+      "start_date": "2026-03-02",
+      "notes": ""
+    }
+  ],
+  "conditions": [
+    "Type 2 Diabetes",
+    "Hypertension"
+  ],
+  "allergies": [
+    "Penicillin",
+    "Sulfa drugs"
+  ],
+  "lifestyle_notes": "Desk job, walks 3-4 times per week, vegetarian diet, occasional stress from work deadlines",
+  "created_at": "2026-02-18T09:30:00.000000",
+  "updated_at": "2026-03-02T01:06:06.870963"
+}

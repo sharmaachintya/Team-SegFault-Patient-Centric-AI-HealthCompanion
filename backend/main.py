@@ -32,8 +32,8 @@ logger = logging.getLogger(__name__)
 
 # Initialize app
 app = FastAPI(
-    title="AI Health Companion",
-    description="Patient-Centric, Non-Diagnostic Health Assistant powered by Agentic AI",
+    title="MedAlly",
+    description="Patient-Centric, Non-Diagnostic AI Health Companion powered by Agentic AI",
     version="1.0.0",
 )
 

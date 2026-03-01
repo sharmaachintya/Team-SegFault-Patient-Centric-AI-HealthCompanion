@@ -9,11 +9,12 @@ export default {
     { pattern: /bg-(emerald|amber|blue|purple|orange|indigo|green|gray|red)-(50|100|300|400|500)/ },
     { pattern: /text-(emerald|amber|blue|purple|orange|indigo|green|gray|red)-(400|500|600|700)/ },
     { pattern: /border-(emerald|amber|blue|purple|orange|indigo|green|gray|red)-(100|200|300)/ },
-    { pattern: /hover:bg-(emerald|amber|blue|purple|orange|indigo|green|gray|red)-(50|100)/ },
-    { pattern: /hover:border-(emerald|amber|blue|purple|orange|indigo|green|gray|red)-(300)/ },
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+      },
       colors: {
         primary: {
           50: '#eff6ff',

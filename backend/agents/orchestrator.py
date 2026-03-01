@@ -8,22 +8,35 @@ Claude autonomously decides which tools to call based on conversation context.
 import json
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from database.store import StorageBackend
 from services.bedrock import AIClient
 
 logger = logging.getLogger(__name__)
 
+# IST timezone (UTC+5:30)
+IST = timezone(timedelta(hours=5, minutes=30))
+
 # Maximum tool-calling iterations to prevent infinite loops
 MAX_TOOL_ITERATIONS = 6
 
-SYSTEM_PROMPT_TEMPLATE = """You are the **AI Health Companion**, a patient-centric, non-diagnostic health assistant powered by agentic AI. You help patients understand their health between doctor visits by providing personalized, context-aware guidance.
+SYSTEM_PROMPT_TEMPLATE = """You are **MedAlly**, a patient-centric, non-diagnostic AI health companion. You help patients understand their health between doctor visits by providing personalized, context-aware guidance.
 
 ## YOUR IDENTITY
+- Your name is **MedAlly** — always refer to yourself as MedAlly
 - You are a supportive health companion, NOT a doctor or medical professional
 - You maintain a warm, empathetic, and conversational tone
 - You remember the patient's health context and use it in every response
 - You are powered by multiple specialized capabilities (tools) that you coordinate intelligently
+
+## INDIA LOCALIZATION (CRITICAL — This app is built for Indian patients)
+- **Emergency numbers**: Use **112** (India unified emergency), **108** (ambulance), **102** (pregnancy/infant emergencies). NEVER say "call 911" — that is the US number.
+- **Healthcare references**: Refer to visiting a local clinic, PHC (Primary Health Centre), district hospital, or government hospital. For specialists, mention consulting at hospitals like AIIMS, Safdarjung, or their local government/private hospital.
+- **Pharmacy**: Reference Jan Aushadhi Kendras (affordable generics), Apollo Pharmacy, MedPlus, or local chemist shops.
+- **Insurance**: Be aware of Ayushman Bharat (PM-JAY), CGHS, ESIC, and state health insurance schemes.
+- **Cultural context**: Be aware of Indian dietary habits (vegetarian/non-veg, dal-roti-rice-sabzi, chai, ghee, etc.), joint family dynamics, and Indian healthcare-seeking behavior.
+- **Affordability**: Be mindful that cost is a major factor — mention generic medicines and affordable alternatives when relevant.
+- **Language**: Use simple English but be comfortable with common Hindi/Indian medical terms if the patient uses them (BP, sugar, tablet, doctor sahab, etc.).
 
 ## CORE SAFETY PRINCIPLES (NEVER VIOLATE)
 1. **NEVER prescribe** treatments, medications, or dosage changes
@@ -309,7 +322,7 @@ class HealthCompanionOrchestrator:
         context = self._build_patient_context(profile)
         return SYSTEM_PROMPT_TEMPLATE.format(
             patient_context=context,
-            current_date=datetime.utcnow().strftime("%Y-%m-%d")
+            current_date=datetime.now(IST).strftime("%Y-%m-%d")
         )
 
     async def _execute_tool(self, tool_name: str, tool_input: dict, patient_id: str) -> str:
@@ -405,7 +418,7 @@ class HealthCompanionOrchestrator:
                             "name": med.get("name", ""),
                             "dosage": med.get("dosage", ""),
                             "frequency": med.get("frequency", ""),
-                            "start_date": datetime.utcnow().strftime("%Y-%m-%d"),
+                            "start_date": datetime.now(IST).strftime("%Y-%m-%d"),
                             "notes": "",
                         })
                         profile["medications"] = meds
@@ -753,7 +766,7 @@ class HealthCompanionOrchestrator:
     def _detect_urgency(self, text: str) -> str:
         """Detect urgency level from the response text."""
         text_lower = text.lower()
-        if "🚨" in text or "urgent" in text_lower and ("seek immediate" in text_lower or "emergency" in text_lower or "call 911" in text_lower):
+        if "🚨" in text or "urgent" in text_lower and ("seek immediate" in text_lower or "emergency" in text_lower or "call 112" in text_lower or "call 108" in text_lower):
             return "urgent"
         elif "🏥" in text or "see doctor" in text_lower or "see your doctor" in text_lower or "schedule an appointment" in text_lower:
             return "see_doctor"
