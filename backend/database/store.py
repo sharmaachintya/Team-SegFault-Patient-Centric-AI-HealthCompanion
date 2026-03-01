@@ -211,10 +211,10 @@ class DynamoDBStorage(StorageBackend):
             response = self.conversations_table.query(
                 KeyConditionExpression="patient_id = :pid",
                 ExpressionAttributeValues={":pid": patient_id},
-                ScanIndexForward=True,
-                Limit=limit
             )
             items = response.get("Items", [])
+            # Sort by timestamp to maintain chronological order
+            items.sort(key=lambda x: x.get("timestamp", ""))
             return items[-limit:]
         except Exception:
             return []
