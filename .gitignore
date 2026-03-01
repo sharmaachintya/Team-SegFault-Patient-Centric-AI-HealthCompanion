@@ -1,40 +1,32 @@
-# Environment variables
-.env
-.env.local
-.env.production
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Build output
+frontend/dist/
 
 # Python
-__pycache__/
-*.py[cod]
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
 *.pyo
-venv/
-.venv/
 
-# Node
-node_modules/
-dist/
-.vite/
+# Environment
+backend/.env
+.env
 
-# Local data (patient data files)
-backend/data/*/
-
-# Keep demo data
-!backend/data/demo0001/
-
-# OS
-.DS_Store
-Thumbs.db
-*.swp
-*.swo
+# Local data
+backend/data/
+data/
 
 # IDE
 .vscode/
 .idea/
-*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Logs
 *.log
-npm-debug.log*
-
-# Package locks at root level (not project level)
-/package-lock.json
