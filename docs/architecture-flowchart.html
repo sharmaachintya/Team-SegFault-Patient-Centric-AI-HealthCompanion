@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedAlly — Architecture Flowchart</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; padding: 40px 20px; min-height: 100vh; }
+  h1 { text-align: center; font-size: 2rem; margin-bottom: 8px; background: linear-gradient(135deg, #6366f1, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { text-align: center; color: #94a3b8; font-size: 0.9rem; margin-bottom: 40px; }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* Flow sections */
+  .section { margin-bottom: 50px; }
+  .section-title { font-size: 1.1rem; font-weight: 700; color: #818cf8; margin-bottom: 20px; padding-left: 12px; border-left: 3px solid #6366f1; }
+
+  /* Nodes */
+  .flow { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .node { padding: 14px 24px; border-radius: 12px; text-align: center; max-width: 500px; width: 100%; position: relative; font-size: 0.85rem; line-height: 1.5; }
+  .node-user { background: linear-gradient(135deg, #1e40af, #3b82f6); border: 1px solid #60a5fa; }
+  .node-frontend { background: #1e293b; border: 1px solid #334155; }
+  .node-backend { background: #1a1a2e; border: 1px solid #4338ca; }
+  .node-orchestrator { background: linear-gradient(135deg, #312e81, #4338ca); border: 1px solid #6366f1; min-width: 500px; }
+  .node-bedrock { background: linear-gradient(135deg, #7c3aed, #a855f7); border: 1px solid #c084fc; }
+  .node-tool { background: #064e3b; border: 1px solid #10b981; }
+  .node-db { background: #78350f; border: 1px solid #f59e0b; }
+  .node-decision { background: #1e293b; border: 2px solid #f59e0b; transform: rotate(0deg); padding: 16px 20px; }
+  .node-response { background: linear-gradient(135deg, #065f46, #10b981); border: 1px solid #34d399; }
+
+  .node-label { font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; margin-bottom: 4px; }
+  .node-title { font-weight: 600; font-size: 0.95rem; }
+  .node-desc { font-size: 0.8rem; opacity: 0.8; margin-top: 4px; }
+
+  /* Arrows */
+  .arrow { display: flex; justify-content: center; padding: 4px 0; }
+  .arrow svg { width: 24px; height: 30px; }
+  .arrow-text { font-size: 0.7rem; color: #94a3b8; text-align: center; margin: -2px 0 2px; }
+
+  /* Tool grid */
+  .tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 700px; margin: 0 auto; }
+  .tool-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px 14px; }
+  .tool-card .emoji { font-size: 1.3rem; margin-bottom: 6px; }
+  .tool-card .name { font-weight: 700; font-size: 0.8rem; color: #a5b4fc; }
+  .tool-card .action { font-size: 0.72rem; color: #94a3b8; margin-top: 3px; }
+  .tool-card .storage { font-size: 0.68rem; color: #f59e0b; margin-top: 4px; font-weight: 600; }
+
+  /* Loop indicator */
+  .loop-box { border: 2px dashed #6366f1; border-radius: 16px; padding: 24px 20px; margin: 16px auto; max-width: 700px; position: relative; }
+  .loop-label { position: absolute; top: -12px; left: 24px; background: #0f172a; padding: 0 10px; font-size: 0.75rem; color: #a5b4fc; font-weight: 700; }
+
+  /* Branch */
+  .branch { display: flex; gap: 24px; align-items: flex-start; justify-content: center; margin: 12px 0; }
+  .branch-item { flex: 1; max-width: 300px; }
+
+  /* AWS bar */
+  .aws-bar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 30px 0 10px; }
+  .aws-chip { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 16px; font-size: 0.75rem; display: flex; align-items: center; gap: 6px; }
+  .aws-chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-bedrock { background: #a855f7; }
+  .dot-dynamo { background: #f59e0b; }
+  .dot-s3 { background: #10b981; }
+  .dot-ec2 { background: #3b82f6; }
+
+  /* Legend */
+  .legend { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: #94a3b8; }
+  .legend-color { width: 14px; height: 14px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<h1>🏥 MedAlly — Agentic AI Architecture</h1>
+<p class="subtitle">How the Supervisor Agent orchestrates specialized tool-agents for personalized health guidance</p>
+
+<div class="container">
+
+<!-- AWS Services Bar -->
+<div class="aws-bar">
+  <div class="aws-chip"><div class="dot dot-bedrock"></div> Amazon Bedrock (Claude Sonnet 4)</div>
+  <div class="aws-chip"><div class="dot dot-dynamo"></div> Amazon DynamoDB (Health Memory)</div>
+  <div class="aws-chip"><div class="dot dot-s3"></div> Amazon S3 (Image Storage)</div>
+  <div class="aws-chip"><div class="dot dot-ec2"></div> Amazon EC2 (Compute)</div>
+</div>
+
+<!-- Main Flow -->
+<div class="section">
+  <div class="section-title">Request Flow — From User Input to AI Response</div>
+  <div class="flow">
+
+    <div class="node node-user">
+      <div class="node-label">User Input</div>
+      <div class="node-title">Patient sends message (text / voice / image)</div>
+      <div class="node-desc">"I started Lisinopril 3 days ago and now I have a dry cough"</div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 24 30"><path d="M12 0 L12 24 M6 18 L12 24 L18 18" stroke="#60a5fa" stroke-width="2" fill="none"/></svg></div>
+
+    <div class="node node-frontend">
+      <div class="node-label">Frontend — React (ChatPanel.jsx)</div>
+      <div class="node-title">POST /api/chat/stream → SSE streaming connection</div>
+      <div class="node-desc">Sends patient_id, message, conversation_history to backend</div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 24 30"><path d="M12 0 L12 24 M6 18 L12 24 L18 18" stroke="#60a5fa" stroke-width="2" fill="none"/></svg></div>
+
+    <div class="node node-backend">
+      <div class="node-label">Backend — FastAPI (main.py)</div>
+      <div class="node-title">Fetches stored conversations → Passes to Orchestrator</div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 24 30"><path d="M12 0 L12 24 M6 18 L12 24 L18 18" stroke="#6366f1" stroke-width="2.5" fill="none"/></svg></div>
+
+    <div class="node node-orchestrator">
+      <div class="node-label">🧠 Supervisor Agent — Orchestrator (orchestrator.py)</div>
+      <div class="node-title">Builds System Prompt + Patient Context → Sends to Claude</div>
+      <div class="node-desc">System prompt contains: AI identity, safety rules, tool instructions, patient's medications/conditions/allergies, current date</div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 24 30"><path d="M12 0 L12 24 M6 18 L12 24 L18 18" stroke="#a855f7" stroke-width="2.5" fill="none"/></svg></div>
+
+    <!-- Agentic Loop -->
+    <div class="loop-box">
+      <div class="loop-label">⚡ AGENTIC LOOP (max 6 iterations)</div>
+
+      <div class="flow">
+        <div class="node node-bedrock">
+          <div class="node-label">Amazon Bedrock — Claude Sonnet 4</div>
+          <div class="node-title">Claude AUTONOMOUSLY decides: respond or call tools?</div>
+          <div class="node-desc">Receives: system prompt + messages + 6 tool definitions</div>
+        </div>
+
+        <div class="arrow"><svg viewBox="0 0 24 30"><path d="M12 0 L12 24 M6 18 L12 24 L18 18" stroke="#f59e0b" stroke-width="2" fill="none"/></svg></div>
+
+        <div class="node node-decision">
+          <div class="node-title">⚖️ Claude's Decision</div>
+          <div class="node-desc">Does Claude need more information? Does it need to save data?</div>
+        </div>
+
+        <div style="height: 8px"></div>
+
+        <div class="branch">
+          <div class="branch-item">
+            <div class="arrow-text" style="color: #10b981; font-weight: 700;">YES → Call Tools</div>
+            <div class="node node-tool" style="margin-top: 8px;">
+              <div class="node-title">Execute Tool(s) → Return results to Claude</div>
+              <div class="node-desc">Claude may call 1-3 tools per iteration. Results feed back into the loop.</div>
+            </div>
+            <div class="arrow-text" style="margin-top: 8px;">↩ Loop back to Claude with tool results</div>
+          </div>
+          <div class="branch-item">
+            <div class="arrow-text" style="color: #3b82f6; font-weight: 700;">NO → Generate Response</div>
+            <div class="node node-response" style="margin-top: 8px;">
+              <div class="node-title">Stream final text response to user</div>
+              <div class="node-desc">Detect urgency level → Save to DynamoDB → Exit loop</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Agent Tools -->
+<div class="section">
+  <div class="section-title">The 6 Agent-Tools (Claude calls these autonomously)</div>
+  <div class="tool-grid">
+    <div class="tool-card">
+      <div class="emoji">👤</div>
+      <div class="name">get_health_profile</div>
+      <div class="action">READ patient's medications, conditions, allergies, personal info</div>
+      <div class="storage">→ DynamoDB: Profiles table</div>
+    </div>
+    <div class="tool-card">
+      <div class="emoji">🔍</div>
+      <div class="name">search_health_timeline</div>
+      <div class="action">READ past symptoms, medication changes, health events</div>
+      <div class="storage">→ DynamoDB: Timeline table</div>
+    </div>
+    <div class="tool-card">
+      <div class="emoji">📝</div>
+      <div class="name">log_health_event</div>
+      <div class="action">WRITE new symptom, medication change, or health event</div>
+      <div class="storage">→ DynamoDB: Timeline table</div>
+    </div>
+    <div class="tool-card">
+      <div class="emoji">📊</div>
+      <div class="name">analyze_health_patterns</div>
+      <div class="action">READ timeline + conversations to discover correlations and trends</div>
+      <div class="storage">→ DynamoDB: Timeline + Conversations</div>
+    </div>
+    <div class="tool-card">
+      <div class="emoji">✏️</div>
+      <div class="name">update_health_profile</div>
+      <div class="action">WRITE name, age, medications, conditions, allergies extracted from chat</div>
+      <div class="storage">→ DynamoDB: Profiles table</div>
+    </div>
+    <div class="tool-card">
+      <div class="emoji">📸</div>
+      <div class="name">Skin Image Analysis</div>
+      <div class="action">Multimodal vision — image sent inline with message to Claude</div>
+      <div class="storage">→ S3: Image bucket + DynamoDB metadata</div>
+    </div>
+  </div>
+</div>
+
+<!-- Example Flow -->
+<div class="section">
+  <div class="section-title">Example: "I have a dry cough since starting Lisinopril"</div>
+  <div class="flow" style="gap: 2px;">
+    <div class="node" style="background: #312e81; border: 1px solid #6366f1; max-width: 600px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.2rem;">1️⃣</span>
+        <div>
+          <div style="font-weight: 700; font-size: 0.85rem;">Claude calls: get_health_profile</div>
+          <div style="font-size: 0.75rem; opacity: 0.7;">→ Retrieves: Metformin 500mg, Lisinopril 10mg, Type 2 Diabetes, Penicillin allergy</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 24 20"><path d="M12 0 L12 16 M8 12 L12 16 L16 12" stroke="#6366f1" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="node" style="background: #312e81; border: 1px solid #6366f1; max-width: 600px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.2rem;">2️⃣</span>
+        <div>
+          <div style="font-weight: 700; font-size: 0.85rem;">Claude calls: search_health_timeline</div>
+          <div style="font-size: 0.75rem; opacity: 0.7;">→ Checks: any prior cough reports? When was Lisinopril started?</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 24 20"><path d="M12 0 L12 16 M8 12 L12 16 L16 12" stroke="#6366f1" stroke-width="1.5" fill="none"/></svg></div>
+    <div class="node" style="background: #312e81; border: 1px solid #6366f1; max-width: 600px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.2rem;">3️⃣</span>
+        <div>
+          <div style="font-weight: 700; font-size: 0.85rem;">Claude calls: log_health_event</div>
+          <div style="font-size: 0.75rem; opacity: 0.7;">→ Logs: "Dry cough — 3 days, likely ACE inhibitor side effect" (severity: low)</div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 24 20"><path d="M12 0 L12 16 M8 12 L12 16 L16 12" stroke="#10b981" stroke-width="2" fill="none"/></svg></div>
+    <div class="node node-response" style="max-width: 600px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 1.2rem;">4️⃣</span>
+        <div>
+          <div style="font-weight: 700; font-size: 0.85rem;">Claude generates response with ✅ Reassurance badge</div>
+          <div style="font-size: 0.75rem; opacity: 0.9;">"Dry cough is a very common ACE inhibitor side effect affecting ~10% of patients. Given you started Lisinopril just 3 days ago, this is expected. Consider asking your doctor about switching to an ARB like Losartan."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-color" style="background: #3b82f6;"></div> User / Frontend</div>
+  <div class="legend-item"><div class="legend-color" style="background: #4338ca;"></div> Backend / Orchestrator</div>
+  <div class="legend-item"><div class="legend-color" style="background: #a855f7;"></div> Amazon Bedrock (Claude)</div>
+  <div class="legend-item"><div class="legend-color" style="background: #10b981;"></div> Tool Execution</div>
+  <div class="legend-item"><div class="legend-color" style="background: #f59e0b;"></div> Decision / DynamoDB</div>
+</div>
+
+<p style="text-align: center; margin-top: 40px; color: #64748b; font-size: 0.75rem;">MedAlly — Team SegFault | AI for Bharat Hackathon | Built on AWS</p>
+
+</div>
+</body>
+</html>

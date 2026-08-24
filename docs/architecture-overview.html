@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MedAlly Architecture</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 32px 24px; }
+  .container { max-width: 720px; margin: 0 auto; }
+  h1 { text-align: center; font-size: 1.4rem; margin-bottom: 4px; background: linear-gradient(135deg, #6366f1, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .sub { text-align: center; color: #64748b; font-size: 0.72rem; margin-bottom: 24px; }
+
+  .aws { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+  .chip { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 5px 12px; font-size: 0.65rem; display: flex; align-items: center; gap: 5px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  .flow { display: flex; flex-direction: column; align-items: center; }
+  .box { padding: 10px 20px; border-radius: 10px; text-align: center; width: 100%; max-width: 520px; font-size: 0.78rem; line-height: 1.4; }
+  .lbl { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.6; margin-bottom: 2px; }
+  .ttl { font-weight: 700; font-size: 0.82rem; }
+  .desc { font-size: 0.68rem; opacity: 0.75; margin-top: 2px; }
+
+  .arr { padding: 2px 0; display: flex; justify-content: center; }
+  .arr svg { width: 20px; height: 22px; }
+
+  .user { background: linear-gradient(135deg, #1e40af, #3b82f6); border: 1px solid #60a5fa; }
+  .be { background: #1a1a2e; border: 1px solid #4338ca; }
+  .orch { background: linear-gradient(135deg, #312e81, #4338ca); border: 1px solid #6366f1; }
+  .bed { background: linear-gradient(135deg, #7c3aed, #a855f7); border: 1px solid #c084fc; }
+  .tool { background: #064e3b; border: 1px solid #10b981; }
+  .resp { background: linear-gradient(135deg, #065f46, #10b981); border: 1px solid #34d399; }
+  .dec { background: #1e293b; border: 2px solid #f59e0b; }
+
+  .loop { border: 2px dashed #6366f1; border-radius: 12px; padding: 16px 14px; margin: 8px auto; max-width: 560px; position: relative; }
+  .loop-lbl { position: absolute; top: -10px; left: 16px; background: #0f172a; padding: 0 8px; font-size: 0.62rem; color: #a5b4fc; font-weight: 700; }
+
+  .branch { display: flex; gap: 16px; justify-content: center; margin: 8px 0; }
+  .branch-item { flex: 1; max-width: 240px; text-align: center; }
+  .br-label { font-size: 0.62rem; font-weight: 700; margin-bottom: 6px; }
+
+  .tools-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 10px 0 6px; }
+  .t { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 4px 8px; font-size: 0.58rem; color: #a5b4fc; font-weight: 600; }
+
+  .db-row { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+  .db { background: #78350f; border: 1px solid #f59e0b; border-radius: 8px; padding: 6px 14px; font-size: 0.65rem; font-weight: 600; color: #fbbf24; }
+  .s3 { background: #064e3b; border: 1px solid #10b981; border-radius: 8px; padding: 6px 14px; font-size: 0.65rem; font-weight: 600; color: #34d399; }
+
+  .foot { text-align: center; margin-top: 16px; color: #475569; font-size: 0.55rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🏥 MedAlly — Architecture Overview</h1>
+  <p class="sub">Agentic AI Health Companion | Built on AWS</p>
+
+  <div class="aws">
+    <div class="chip"><div class="dot" style="background:#a855f7"></div>Bedrock (Claude Sonnet 4)</div>
+    <div class="chip"><div class="dot" style="background:#f59e0b"></div>DynamoDB</div>
+    <div class="chip"><div class="dot" style="background:#10b981"></div>S3</div>
+    <div class="chip"><div class="dot" style="background:#3b82f6"></div>EC2</div>
+  </div>
+
+  <div class="flow">
+    <div class="box user">
+      <div class="lbl">Patient</div>
+      <div class="ttl">Text / Voice / Image Input</div>
+    </div>
+
+    <div class="arr"><svg viewBox="0 0 20 22"><path d="M10 0 L10 18 M5 13 L10 18 L15 13" stroke="#60a5fa" stroke-width="2" fill="none"/></svg></div>
+
+    <div class="box be">
+      <div class="lbl">FastAPI Backend (EC2)</div>
+      <div class="ttl">REST API + SSE Streaming</div>
+    </div>
+
+    <div class="arr"><svg viewBox="0 0 20 22"><path d="M10 0 L10 18 M5 13 L10 18 L15 13" stroke="#6366f1" stroke-width="2" fill="none"/></svg></div>
+
+    <div class="box orch">
+      <div class="lbl">🧠 Supervisor Agent</div>
+      <div class="ttl">Orchestrator — System Prompt + Patient Context</div>
+    </div>
+
+    <div class="arr"><svg viewBox="0 0 20 22"><path d="M10 0 L10 18 M5 13 L10 18 L15 13" stroke="#a855f7" stroke-width="2" fill="none"/></svg></div>
+
+    <div class="loop">
+      <div class="loop-lbl">⚡ AGENTIC LOOP (max 6 iterations)</div>
+
+      <div class="flow">
+        <div class="box bed" style="max-width:480px">
+          <div class="lbl">Amazon Bedrock</div>
+          <div class="ttl">Claude Sonnet 4 — Converse API + Tool Calling</div>
+          <div class="desc">Autonomously decides which tools to invoke</div>
+        </div>
+
+        <div class="arr"><svg viewBox="0 0 20 22"><path d="M10 0 L10 18 M5 13 L10 18 L15 13" stroke="#f59e0b" stroke-width="1.5" fill="none"/></svg></div>
+
+        <div class="branch">
+          <div class="branch-item">
+            <div class="br-label" style="color:#10b981">⬅ Call Tools</div>
+            <div class="box tool" style="padding:8px 12px">
+              <div class="ttl" style="font-size:0.72rem">Execute Agent-Tools</div>
+              <div class="desc">Results loop back to Claude</div>
+            </div>
+            <div class="tools-row">
+              <div class="t">👤 Profile Reader</div>
+              <div class="t">🔍 Timeline Search</div>
+              <div class="t">📝 Event Logger</div>
+            </div>
+            <div class="tools-row">
+              <div class="t">📊 Pattern Analyzer</div>
+              <div class="t">✏️ Profile Updater</div>
+              <div class="t">📸 Image Analysis</div>
+            </div>
+          </div>
+
+          <div class="branch-item">
+            <div class="br-label" style="color:#3b82f6">➡ Respond</div>
+            <div class="box resp" style="padding:8px 12px">
+              <div class="ttl" style="font-size:0.72rem">Stream Response to Patient</div>
+              <div class="desc">With urgency badge + save to DB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arr"><svg viewBox="0 0 20 22"><path d="M10 0 L10 18 M5 13 L10 18 L15 13" stroke="#f59e0b" stroke-width="1.5" fill="none"/></svg></div>
+
+    <div class="db-row">
+      <div class="db">📦 DynamoDB — Profiles | Timeline | Conversations</div>
+      <div class="s3">🖼 S3 — Images</div>
+    </div>
+  </div>
+
+  <p class="foot">MedAlly — Team SegFault | AI for Bharat Hackathon</p>
+</div>
+</body>
+</html>
